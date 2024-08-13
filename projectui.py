@@ -1,12 +1,22 @@
 import streamlit as st
 import cv2
+import requests
 import numpy as np
 from ultralytics import YOLO
 import os
 import tempfile
 
-model = YOLO(r"C:\Users\daksh\Vamsi Python\Deep Learning\runs\detect\train11\weights\best.pt")
+def download_model(url):
+    response = requests.get(url, stream=True)
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pt") as temp_file:
+        for chunk in response.iter_content(chunk_size=8192):
+            temp_file.write(chunk)
+        temp_file_path = temp_file.name
+    return temp_file_path
 
+model_url = 'https://github.com/DakshinVamsi/PatientMovementDetection/edit/main/best.pt'
+model_path = download_model(model_url)
+model = YOLO(model_path)
 label_map = {
     1: 'trigger_movement',       # assuming class ID 1 is 'trigger_movement'
     2: 'non_trigger_movement'    # assuming class ID 2 is 'non_trigger_movement'
